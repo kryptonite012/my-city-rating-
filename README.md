@@ -8,4 +8,4 @@ API Reference — all 18 endpoints in tables
 Database Schema — all 3 collections with field types
 Security, Testing, Performance — tables matching the PDF specs
 Future Scope — Phase 2 & 3 features
-References — all 9 from t
+
