@@ -9,4 +9,4 @@ Database Schema — all 3 collections with field types
 Security, Testing, Performance — tables matching the PDF specs
 Future Scope — Phase 2 & 3 features
 
-new update
+
