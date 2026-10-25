@@ -1,0 +1,340 @@
+{
+  "places": [
+    {
+      "_id": "1",
+      "name": "Sharma's Dhaba",
+      "category": "dhaba",
+      "location": {
+        "address": "Alpha 1, Greater Noida",
+        "sector": "Alpha 1"
+      },
+      "averageRating": 4.6,
+      "sentimentScore": 0.91,
+      "totalReviews": 38,
+      "isHiddenGem": true,
+      "trendScore": 0.88,
+      "priceRange": "budget",
+      "tags": [
+        "quick bites",
+        "thali",
+        "students favourite"
+      ],
+      "vibeSummary": "The vibe here is pure student hustle fuel — cheap, fast, and surprisingly good. The dal tadka has earned cult status among GNIOT hostelites.",
+      "images": [],
+      "hours": {
+        "open": "7am",
+        "close": "11pm"
+      }
+    },
+    {
+      "_id": "2",
+      "name": "Green Valley PG Boys",
+      "category": "pg",
+      "location": {
+        "address": "Sector 10, Greater Noida",
+        "sector": "Sector 10"
+      },
+      "averageRating": 4.1,
+      "sentimentScore": 0.76,
+      "totalReviews": 62,
+      "isHiddenGem": false,
+      "trendScore": 0.71,
+      "priceRange": "mid",
+      "tags": [
+        "wifi",
+        "AC rooms",
+        "tiffin available"
+      ],
+      "vibeSummary": "Solid mid-range PG that delivers on the basics — fast WiFi, clean bathrooms, and a warden who actually sleeps. Occasional power cuts are the main gripe.",
+      "images": [],
+      "hours": null
+    },
+    {
+      "_id": "3",
+      "name": "Momentum Coaching Centre",
+      "category": "coaching",
+      "location": {
+        "address": "Knowledge Park 2, Greater Noida",
+        "sector": "KP-2"
+      },
+      "averageRating": 4.4,
+      "sentimentScore": 0.85,
+      "totalReviews": 29,
+      "isHiddenGem": true,
+      "trendScore": 0.82,
+      "priceRange": "mid",
+      "tags": [
+        "JEE",
+        "GATE",
+        "study material"
+      ],
+      "vibeSummary": "A hidden gem for GATE aspirants — small batches mean you're never just a roll number. Faculty is genuinely invested in your progress, not just clearing syllabus.",
+      "images": [],
+      "hours": {
+        "open": "8am",
+        "close": "8pm"
+      }
+    },
+    {
+      "_id": "4",
+      "name": "Route 36 Auto Stand",
+      "category": "transport",
+      "location": {
+        "address": "Pari Chowk, Greater Noida",
+        "sector": "Pari Chowk"
+      },
+      "averageRating": 3.2,
+      "sentimentScore": 0.44,
+      "totalReviews": 87,
+      "isHiddenGem": false,
+      "trendScore": 0.39,
+      "priceRange": "budget",
+      "tags": [
+        "metro connect",
+        "e-rickshaw",
+        "frequent"
+      ],
+      "vibeSummary": "Functional but chaotic — autos are plentiful at peak hours but disappear mysteriously at 9pm. Bargain hard and you'll get a fair deal most days.",
+      "images": [],
+      "hours": null
+    },
+    {
+      "_id": "5",
+      "name": "Chai Tapri Co.",
+      "category": "dhaba",
+      "location": {
+        "address": "Near GALGOTIAS, Sector 17A",
+        "sector": "Sector 17A"
+      },
+      "averageRating": 4.8,
+      "sentimentScore": 0.94,
+      "totalReviews": 14,
+      "isHiddenGem": true,
+      "trendScore": 0.79,
+      "priceRange": "budget",
+      "tags": [
+        "chai",
+        "maggi",
+        "late night"
+      ],
+      "vibeSummary": "Nobody told us about this place — which is exactly the problem. Best masala chai in GN, 24 hours, and a bhaiya who remembers your order after the second visit.",
+      "images": [],
+      "hours": {
+        "open": "12am",
+        "close": "12am"
+      }
+    },
+    {
+      "_id": "6",
+      "name": "Sunrise Girls PG",
+      "category": "pg",
+      "location": {
+        "address": "Gamma 1, Greater Noida",
+        "sector": "Gamma 1"
+      },
+      "averageRating": 4.5,
+      "sentimentScore": 0.88,
+      "totalReviews": 51,
+      "isHiddenGem": false,
+      "trendScore": 0.84,
+      "priceRange": "mid",
+      "tags": [
+        "girls only",
+        "security",
+        "homely food"
+      ],
+      "vibeSummary": "One of the safest and most homely PGs in GN. The food is genuinely home-cooked, not canteen reheats. Strict timings are the only trade-off.",
+      "images": [],
+      "hours": null
+    }
+  ],
+  "reviews": {
+    "1": [
+      {
+        "_id": "r1",
+        "userId": "u1",
+        "username": "Aarav_GNIOT",
+        "rating": 5,
+        "text": "Best thali in all of GN honestly. 70 rupees and you're full till night. Found this place in my first week and never looked back!",
+        "sentimentLabel": "positive",
+        "sentimentScore": 0.95,
+        "themes": [
+          "value",
+          "food quality",
+          "discovery"
+        ],
+        "daysAgo": 2
+      },
+      {
+        "_id": "r2",
+        "userId": "u2",
+        "username": "Priya_GL",
+        "rating": 4,
+        "text": "Tasty food but can get crowded during lunch hour. The dal makhani is a must try. Service is quick once you find a seat.",
+        "sentimentLabel": "positive",
+        "sentimentScore": 0.78,
+        "themes": [
+          "food quality",
+          "crowd"
+        ],
+        "daysAgo": 5
+      },
+      {
+        "_id": "r3",
+        "userId": "u3",
+        "username": "Rohit_Noida",
+        "rating": 5,
+        "text": "Student budget ka best option. Nobody knows about this place which is a crime honestly.",
+        "sentimentLabel": "positive",
+        "sentimentScore": 0.91,
+        "themes": [
+          "value",
+          "hidden gem"
+        ],
+        "daysAgo": 8
+      }
+    ],
+    "2": [
+      {
+        "_id": "r4",
+        "userId": "u4",
+        "username": "Shreya_NIT",
+        "rating": 4,
+        "text": "Good PG overall. WiFi is fast which is the most important thing. Food could be better but it's manageable.",
+        "sentimentLabel": "positive",
+        "sentimentScore": 0.72,
+        "themes": [
+          "wifi",
+          "food",
+          "value"
+        ],
+        "daysAgo": 3
+      },
+      {
+        "_id": "r5",
+        "userId": "u5",
+        "username": "Karan_GL",
+        "rating": 3,
+        "text": "Average experience. Power cuts are annoying during exams. Warden is okay, not strict.",
+        "sentimentLabel": "neutral",
+        "sentimentScore": 0.48,
+        "themes": [
+          "power issues",
+          "management"
+        ],
+        "daysAgo": 10
+      }
+    ],
+    "3": [
+      {
+        "_id": "r6",
+        "userId": "u6",
+        "username": "Ankit_GATE",
+        "rating": 5,
+        "text": "Sir actually replies to doubts on WhatsApp at 11pm. This doesn't happen at big coaching institutes. Small batch is their biggest advantage.",
+        "sentimentLabel": "positive",
+        "sentimentScore": 0.93,
+        "themes": [
+          "faculty",
+          "small batch",
+          "support"
+        ],
+        "daysAgo": 1
+      },
+      {
+        "_id": "r7",
+        "userId": "u7",
+        "username": "Meera_CSE",
+        "rating": 4,
+        "text": "Quality study material and focused teaching. Found this place through a friend and glad I did.",
+        "sentimentLabel": "positive",
+        "sentimentScore": 0.81,
+        "themes": [
+          "material",
+          "discovery",
+          "quality"
+        ],
+        "daysAgo": 7
+      }
+    ],
+    "4": [
+      {
+        "_id": "r8",
+        "userId": "u8",
+        "username": "Dev_GNIOT",
+        "rating": 2,
+        "text": "Auto drivers at Pari Chowk are sharks during peak hours. Always overcharge newcomers. Infrastructure needs serious work.",
+        "sentimentLabel": "negative",
+        "sentimentScore": 0.23,
+        "themes": [
+          "pricing",
+          "overcharging",
+          "infrastructure"
+        ],
+        "daysAgo": 4
+      },
+      {
+        "_id": "r9",
+        "userId": "u9",
+        "username": "Simran_GL",
+        "rating": 4,
+        "text": "E-rickshaws are actually fine and affordable. The issue is only with autos. Go for ricks and you'll be fine.",
+        "sentimentLabel": "positive",
+        "sentimentScore": 0.67,
+        "themes": [
+          "e-rickshaw",
+          "pricing"
+        ],
+        "daysAgo": 6
+      }
+    ],
+    "5": [
+      {
+        "_id": "r10",
+        "userId": "u10",
+        "username": "NightOwl_Coder",
+        "rating": 5,
+        "text": "3am coding session saviour. Chai is unreal. Found this place by accident and I've been going back every single night since.",
+        "sentimentLabel": "positive",
+        "sentimentScore": 0.97,
+        "themes": [
+          "chai",
+          "late night",
+          "discovery"
+        ],
+        "daysAgo": 1
+      },
+      {
+        "_id": "r11",
+        "userId": "u11",
+        "username": "Aisha_ECE",
+        "rating": 5,
+        "text": "Nobody knows about this tapri which is criminal. Best chai in GN, no competition.",
+        "sentimentLabel": "positive",
+        "sentimentScore": 0.95,
+        "themes": [
+          "chai",
+          "hidden gem"
+        ],
+        "daysAgo": 3
+      }
+    ],
+    "6": [
+      {
+        "_id": "r12",
+        "userId": "u12",
+        "username": "Tanvi_MBA",
+        "rating": 5,
+        "text": "Finally a PG that feels like home. Aunty makes rotis fresh every night. Strict 10pm curfew but it's for safety so I'm okay with it.",
+        "sentimentLabel": "positive",
+        "sentimentScore": 0.89,
+        "themes": [
+          "food",
+          "safety",
+          "homely"
+        ],
+        "daysAgo": 2
+      }
+    ]
+  }
+}

@@ -1,132 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-
-// ─── MOCK DATA ────────────────────────────────────────────────────────────────
-const MOCK_PLACES = [
-  {
-    _id: "1", name: "Sharma's Dhaba", category: "dhaba",
-    location: { address: "Alpha 1, Greater Noida", sector: "Alpha 1" },
-    averageRating: 4.6, sentimentScore: 0.91, totalReviews: 38,
-    isHiddenGem: true, trendScore: 0.88, priceRange: "budget",
-    tags: ["quick bites", "thali", "students favourite"],
-    vibeSummary: "The vibe here is pure student hustle fuel — cheap, fast, and surprisingly good. The dal tadka has earned cult status among GNIOT hostelites.",
-    images: [], hours: { open: "7am", close: "11pm" }
-  },
-  {
-    _id: "2", name: "Green Valley PG Boys", category: "pg",
-    location: { address: "Sector 10, Greater Noida", sector: "Sector 10" },
-    averageRating: 4.1, sentimentScore: 0.76, totalReviews: 62,
-    isHiddenGem: false, trendScore: 0.71, priceRange: "mid",
-    tags: ["wifi", "AC rooms", "tiffin available"],
-    vibeSummary: "Solid mid-range PG that delivers on the basics — fast WiFi, clean bathrooms, and a warden who actually sleeps. Occasional power cuts are the main gripe.",
-    images: [], hours: null
-  },
-  {
-    _id: "3", name: "Momentum Coaching Centre", category: "coaching",
-    location: { address: "Knowledge Park 2, Greater Noida", sector: "KP-2" },
-    averageRating: 4.4, sentimentScore: 0.85, totalReviews: 29,
-    isHiddenGem: true, trendScore: 0.82, priceRange: "mid",
-    tags: ["JEE", "GATE", "study material"],
-    vibeSummary: "A hidden gem for GATE aspirants — small batches mean you're never just a roll number. Faculty is genuinely invested in your progress, not just clearing syllabus.",
-    images: [], hours: { open: "8am", close: "8pm" }
-  },
-  {
-    _id: "4", name: "Route 36 Auto Stand", category: "transport",
-    location: { address: "Pari Chowk, Greater Noida", sector: "Pari Chowk" },
-    averageRating: 3.2, sentimentScore: 0.44, totalReviews: 87,
-    isHiddenGem: false, trendScore: 0.39, priceRange: "budget",
-    tags: ["metro connect", "e-rickshaw", "frequent"],
-    vibeSummary: "Functional but chaotic — autos are plentiful at peak hours but disappear mysteriously at 9pm. Bargain hard and you'll get a fair deal most days.",
-    images: [], hours: null
-  },
-  {
-    _id: "5", name: "Chai Tapri Co.", category: "dhaba",
-    location: { address: "Near GALGOTIAS, Sector 17A", sector: "Sector 17A" },
-    averageRating: 4.8, sentimentScore: 0.94, totalReviews: 14,
-    isHiddenGem: true, trendScore: 0.79, priceRange: "budget",
-    tags: ["chai", "maggi", "late night"],
-    vibeSummary: "Nobody told us about this place — which is exactly the problem. Best masala chai in GN, 24 hours, and a bhaiya who remembers your order after the second visit.",
-    images: [], hours: { open: "12am", close: "12am" }
-  },
-  {
-    _id: "6", name: "Sunrise Girls PG", category: "pg",
-    location: { address: "Gamma 1, Greater Noida", sector: "Gamma 1" },
-    averageRating: 4.5, sentimentScore: 0.88, totalReviews: 51,
-    isHiddenGem: false, trendScore: 0.84, priceRange: "mid",
-    tags: ["girls only", "security", "homely food"],
-    vibeSummary: "One of the safest and most homely PGs in GN. The food is genuinely home-cooked, not canteen reheats. Strict timings are the only trade-off.",
-    images: [], hours: null
-  },
-];
-
-const MOCK_REVIEWS = {
-  "1": [
-    { _id: "r1", userId: "u1", username: "Aarav_GNIOT", rating: 5, text: "Best thali in all of GN honestly. 70 rupees and you're full till night. Found this place in my first week and never looked back!", sentimentLabel: "positive", sentimentScore: 0.95, themes: ["value", "food quality", "discovery"], createdAt: new Date(Date.now() - 86400000 * 2) },
-    { _id: "r2", userId: "u2", username: "Priya_GL", rating: 4, text: "Tasty food but can get crowded during lunch hour. The dal makhani is a must try. Service is quick once you find a seat.", sentimentLabel: "positive", sentimentScore: 0.78, themes: ["food quality", "crowd"], createdAt: new Date(Date.now() - 86400000 * 5) },
-    { _id: "r3", userId: "u3", username: "Rohit_Noida", rating: 5, text: "Student budget ka best option. Nobody knows about this place which is a crime honestly.", sentimentLabel: "positive", sentimentScore: 0.91, themes: ["value", "hidden gem"], createdAt: new Date(Date.now() - 86400000 * 8) },
-  ],
-  "2": [
-    { _id: "r4", userId: "u4", username: "Shreya_NIT", rating: 4, text: "Good PG overall. WiFi is fast which is the most important thing. Food could be better but it's manageable.", sentimentLabel: "positive", sentimentScore: 0.72, themes: ["wifi", "food", "value"], createdAt: new Date(Date.now() - 86400000 * 3) },
-    { _id: "r5", userId: "u5", username: "Karan_GL", rating: 3, text: "Average experience. Power cuts are annoying during exams. Warden is okay, not strict.", sentimentLabel: "neutral", sentimentScore: 0.48, themes: ["power issues", "management"], createdAt: new Date(Date.now() - 86400000 * 10) },
-  ],
-  "3": [
-    { _id: "r6", userId: "u6", username: "Ankit_GATE", rating: 5, text: "Sir actually replies to doubts on WhatsApp at 11pm. This doesn't happen at big coaching institutes. Small batch is their biggest advantage.", sentimentLabel: "positive", sentimentScore: 0.93, themes: ["faculty", "small batch", "support"], createdAt: new Date(Date.now() - 86400000 * 1) },
-    { _id: "r7", userId: "u7", username: "Meera_CSE", rating: 4, text: "Quality study material and focused teaching. Found this place through a friend and glad I did.", sentimentLabel: "positive", sentimentScore: 0.81, themes: ["material", "discovery", "quality"], createdAt: new Date(Date.now() - 86400000 * 7) },
-  ],
-  "4": [
-    { _id: "r8", userId: "u8", username: "Dev_GNIOT", rating: 2, text: "Auto drivers at Pari Chowk are sharks during peak hours. Always overcharge newcomers. Infrastructure needs serious work.", sentimentLabel: "negative", sentimentScore: 0.23, themes: ["pricing", "overcharging", "infrastructure"], createdAt: new Date(Date.now() - 86400000 * 4) },
-    { _id: "r9", userId: "u9", username: "Simran_GL", rating: 4, text: "E-rickshaws are actually fine and affordable. The issue is only with autos. Go for ricks and you'll be fine.", sentimentLabel: "positive", sentimentScore: 0.67, themes: ["e-rickshaw", "pricing"], createdAt: new Date(Date.now() - 86400000 * 6) },
-  ],
-  "5": [
-    { _id: "r10", userId: "u10", username: "NightOwl_Coder", rating: 5, text: "3am coding session saviour. Chai is unreal. Found this place by accident and I've been going back every single night since.", sentimentLabel: "positive", sentimentScore: 0.97, themes: ["chai", "late night", "discovery"], createdAt: new Date(Date.now() - 86400000 * 1) },
-    { _id: "r11", userId: "u11", username: "Aisha_ECE", rating: 5, text: "Nobody knows about this tapri which is criminal. Best chai in GN, no competition.", sentimentLabel: "positive", sentimentScore: 0.95, themes: ["chai", "hidden gem"], createdAt: new Date(Date.now() - 86400000 * 3) },
-  ],
-  "6": [
-    { _id: "r12", userId: "u12", username: "Tanvi_MBA", rating: 5, text: "Finally a PG that feels like home. Aunty makes rotis fresh every night. Strict 10pm curfew but it's for safety so I'm okay with it.", sentimentLabel: "positive", sentimentScore: 0.89, themes: ["food", "safety", "homely"], createdAt: new Date(Date.now() - 86400000 * 2) },
-  ],
-};
-
-// ─── CLAUDE API CALL ─────────────────────────────────────────────────────────
-async function callClaude(systemPrompt, userPrompt) {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1000,
-      system: systemPrompt,
-      messages: [{ role: "user", content: userPrompt }],
-    }),
-  });
-  const data = await response.json();
-  return data.content?.[0]?.text || "";
-}
-
-async function analyzeSentiment(reviewText) {
-  const system = `You are a sentiment analysis engine for a hyperlocal student review platform in Greater Noida, India. Respond ONLY with valid JSON, no other text.`;
-  const user = `Analyse this review: "${reviewText}". Return exactly: {"score": 0.0-1.0, "label": "positive|neutral|negative", "themes": ["theme1","theme2"], "confidence": 0.0-1.0}`;
-  try {
-    const raw = await callClaude(system, user);
-    return JSON.parse(raw.replace(/```json|```/g, "").trim());
-  } catch {
-    const words = reviewText.toLowerCase().split(/\s+/);
-    const pos = ["great","amazing","good","excellent","love","best","perfect","nice","clean","fast","fresh","helpful"].filter(w => words.includes(w)).length;
-    const neg = ["bad","terrible","worst","dirty","slow","expensive","pathetic","horrible","awful"].filter(w => words.includes(w)).length;
-    const score = pos / (pos + neg + 1);
-    return { score, label: score > 0.6 ? "positive" : score < 0.4 ? "negative" : "neutral", themes: [], confidence: 0.5 };
-  }
-}
-
-async function generateVibeSummary(placeName, category, reviews) {
-  const dominant = reviews.reduce((a, r) => a + r.sentimentScore, 0) / reviews.length;
-  const themes = [...new Set(reviews.flatMap(r => r.themes))].slice(0, 5).join(", ");
-  const system = `You write engaging, honest 2-3 sentence "vibe summaries" for places in Greater Noida, India. Write for a student audience. Be specific, authentic, and avoid marketing language.`;
-  const user = `Here are ${reviews.length} reviews for "${placeName}" (a ${category} in Greater Noida). Dominant sentiment: ${Math.round(dominant * 100)}% positive. Recurring themes: ${themes || "general experience"}. Sample reviews: ${reviews.slice(0, 3).map(r => r.text).join(" | ")}. Generate a vibe summary in 2-3 sentences.`;
-  try {
-    return await callClaude(system, user);
-  } catch {
-    return "AI summary unavailable. Check reviews below for community insights.";
-  }
-}
+import { useState, useEffect, useRef, useMemo } from "react";
+import * as api from "./services/api";
 
 // ─── ICONS ───────────────────────────────────────────────────────────────────
 const Icon = ({ name, size = 18 }) => {
@@ -140,7 +13,7 @@ const Icon = ({ name, size = 18 }) => {
     spark: "M13 2L3 14h9l-1 8 10-12h-9l1-8z",
     location: "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z",
     food: "M18 8h1a4 4 0 0 1 0 8h-1 M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z M6 1v3 M10 1v3 M14 1v3",
-    bed: "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z",
+    bed: "M2 4v16 M2 8h18a2 2 0 0 1 2 2v10 M2 17h20 M6 8v9",
     book: "M4 19.5A2.5 2.5 0 0 1 6.5 17H20 M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z",
     bus: "M8 6v6 M15 6v6 M2 12h19.6 M18 18h3s.5-1.7.8-2.8c.3-1.2.2-3.3-2-3.3H4.3C2 12 2 13.8 2.3 15.1c.3 1.1.8 2.8.8 2.8H6 M7 18H4 M19 18h-3 M4 20a2 2 0 1 0 4 0 2 2 0 0 0-4 0 M16 20a2 2 0 1 0 4 0 2 2 0 0 0-4 0",
     settings: "M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16z M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z",
@@ -160,11 +33,11 @@ const Icon = ({ name, size = 18 }) => {
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 const categoryMeta = {
-  dhaba: { label: "Dhaba / Café", color: "#f97316", bg: "#fff7ed", icon: "food" },
-  pg: { label: "PG / Hostel", color: "#8b5cf6", bg: "#f5f3ff", icon: "bed" },
-  coaching: { label: "Coaching", color: "#06b6d4", bg: "#ecfeff", icon: "book" },
-  transport: { label: "Transport", color: "#10b981", bg: "#ecfdf5", icon: "bus" },
-  service: { label: "Services", color: "#f59e0b", bg: "#fffbeb", icon: "settings" },
+  dhaba: { label: "Dhaba / Café", color: "#f97316", bg: "#fff7ed", icon: "food", emoji: "🍛" },
+  pg: { label: "PG / Hostel", color: "#8b5cf6", bg: "#f5f3ff", icon: "bed", emoji: "🏠" },
+  coaching: { label: "Coaching", color: "#06b6d4", bg: "#ecfeff", icon: "book", emoji: "📚" },
+  transport: { label: "Transport", color: "#10b981", bg: "#ecfdf5", icon: "bus", emoji: "🚌" },
+  service: { label: "Services", color: "#f59e0b", bg: "#fffbeb", icon: "settings", emoji: "🛠️" },
 };
 
 function StarDisplay({ rating, size = 14 }) {
@@ -202,14 +75,31 @@ function Badge({ children, color = "#8b5cf6", bg = "#f5f3ff" }) {
 
 function timeAgo(date) {
   const d = Math.floor((Date.now() - new Date(date)) / 86400000);
-  return d === 0 ? "Today" : d === 1 ? "Yesterday" : `${d}d ago`;
+  if (d <= 0) return "Today";
+  if (d === 1) return "Yesterday";
+  if (d < 30) return `${d}d ago`;
+  return new Date(date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 }
+
+function truncate(text = "", max = 120) {
+  return text.length > max ? text.slice(0, max).trimEnd() + "…" : text;
+}
+
+// Makes a clickable div reachable and usable from the keyboard.
+const clickable = (onActivate) => ({
+  role: "button",
+  tabIndex: 0,
+  onClick: onActivate,
+  onKeyDown: e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onActivate(); } },
+});
+
+const priceLabel = { budget: "💰 Budget", mid: "💰💰 Mid", premium: "💰💰💰 Premium" };
 
 // ─── PLACE CARD ───────────────────────────────────────────────────────────────
 function PlaceCard({ place, onClick }) {
   const meta = categoryMeta[place.category] || categoryMeta.service;
   return (
-    <div onClick={() => onClick(place)} style={{
+    <div {...clickable(() => onClick(place))} style={{
       background: "#fff", borderRadius: 16, border: "1px solid #e5e7eb",
       padding: 20, cursor: "pointer", transition: "all 0.2s",
       boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
@@ -235,7 +125,7 @@ function PlaceCard({ place, onClick }) {
       </div>
 
       <p style={{ margin: 0, fontSize: 13, color: "#374151", lineHeight: 1.6, fontStyle: "italic" }}>
-        "{place.vibeSummary?.slice(0, 120)}..."
+        "{truncate(place.vibeSummary)}"
       </p>
 
       <SentimentBar score={place.sentimentScore} />
@@ -247,7 +137,7 @@ function PlaceCard({ place, onClick }) {
           <span style={{ fontSize: 12, color: "#9ca3af" }}>({place.totalReviews} reviews)</span>
         </div>
         <span style={{ fontSize: 12, color: "#6b7280" }}>
-          {place.priceRange === "budget" ? "💰 Budget" : place.priceRange === "mid" ? "💰💰 Mid" : "💰💰💰 Premium"}
+          {priceLabel[place.priceRange] || priceLabel.budget}
         </span>
       </div>
     </div>
@@ -299,36 +189,47 @@ function ReviewForm({ place, onSubmit, onClose }) {
   const [analyzing, setAnalyzing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const [error, setError] = useState("");
   const debounceRef = useRef(null);
+  const requestIdRef = useRef(0);
+
+  useEffect(() => () => clearTimeout(debounceRef.current), []);
 
   const handleTextChange = (val) => {
     setText(val);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (val.length > 15) {
+    clearTimeout(debounceRef.current);
+    // Any in-flight preview is now stale; bumping the id makes its result be ignored.
+    const requestId = ++requestIdRef.current;
+    if (val.trim().length > 15) {
       debounceRef.current = setTimeout(async () => {
         setAnalyzing(true);
-        const result = await analyzeSentiment(val);
+        const result = await api.previewSentiment(val);
+        if (requestId !== requestIdRef.current) return;
         setPreview(result);
         setAnalyzing(false);
       }, 1200);
     } else {
       setPreview(null);
+      setAnalyzing(false);
     }
   };
 
+  const handle = name.trim();
+  const validHandle = /^[\w.-]{2,30}$/.test(handle);
+  const canSubmit = rating > 0 && text.trim().length >= 20 && validHandle && !submitting;
+
   const handleSubmit = async () => {
-    if (!rating || text.length < 20 || !name) return;
+    if (!canSubmit) return;
     setSubmitting(true);
-    const sentiment = preview || await analyzeSentiment(text);
-    const review = {
-      _id: "new_" + Date.now(),
-      userId: "you", username: name, rating, text,
-      sentimentScore: sentiment.score, sentimentLabel: sentiment.label,
-      themes: sentiment.themes, createdAt: new Date(),
-    };
-    await onSubmit(review);
-    setDone(true);
-    setSubmitting(false);
+    setError("");
+    try {
+      await onSubmit(await api.submitReview(place._id, { rating, text: text.trim(), username: handle }));
+      setDone(true);
+    } catch (err) {
+      setError(err.message || "Could not submit your review. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const sentColor = preview ? (preview.label === "positive" ? "#10b981" : preview.label === "negative" ? "#ef4444" : "#f59e0b") : "#6b7280";
@@ -346,7 +247,8 @@ function ReviewForm({ place, onSubmit, onClose }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <div>
         <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#374151", marginBottom: 6 }}>YOUR NAME / HANDLE</label>
-        <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Aarav_GNIOT" style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #d1d5db", fontSize: 14, outline: "none", boxSizing: "border-box" }} />
+        <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Aarav_GNIOT" maxLength={30} style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #d1d5db", fontSize: 14, outline: "none", boxSizing: "border-box" }} />
+        {name && !validHandle && <div style={{ fontSize: 12, color: "#ef4444", marginTop: 4 }}>2-30 characters: letters, numbers, _ . or -</div>}
       </div>
 
       <div>
@@ -357,7 +259,8 @@ function ReviewForm({ place, onSubmit, onClose }) {
               fill={(hover || rating) >= i ? "#f59e0b" : "none"}
               stroke="#f59e0b" strokeWidth="1.5" style={{ cursor: "pointer", transition: "transform 0.1s" }}
               onMouseEnter={() => setHover(i)} onMouseLeave={() => setHover(0)}
-              onClick={() => setRating(i)}
+              aria-label={`${i} star${i > 1 ? "s" : ""}`} aria-pressed={rating === i}
+              {...clickable(() => setRating(i))}
             >
               <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
             </svg>
@@ -367,9 +270,9 @@ function ReviewForm({ place, onSubmit, onClose }) {
 
       <div>
         <label style={{ display: "block", fontSize: 12, fontWeight: 700, color: "#374151", marginBottom: 6 }}>YOUR REVIEW</label>
-        <textarea value={text} onChange={e => handleTextChange(e.target.value)} placeholder="Share your honest experience (min 20 chars)..." rows={4}
+        <textarea value={text} onChange={e => handleTextChange(e.target.value)} placeholder="Share your honest experience (min 20 chars)..." rows={4} maxLength={2000}
           style={{ width: "100%", padding: "10px 12px", borderRadius: 10, border: "1px solid #d1d5db", fontSize: 14, outline: "none", resize: "vertical", fontFamily: "inherit", boxSizing: "border-box" }} />
-        <div style={{ fontSize: 12, color: "#9ca3af", marginTop: 4 }}>{text.length} chars</div>
+        <div style={{ fontSize: 12, color: "#9ca3af", marginTop: 4 }}>{text.length} / 2000 chars</div>
       </div>
 
       {(analyzing || preview) && (
@@ -385,6 +288,7 @@ function ReviewForm({ place, onSubmit, onClose }) {
                 <span style={{ fontSize: 13, fontWeight: 700, color: sentColor }}>{preview.label?.toUpperCase()}</span>
                 <span style={{ fontSize: 12, color: "#9ca3af" }}>Score: {(preview.score * 100).toFixed(0)}%</span>
                 <span style={{ fontSize: 12, color: "#9ca3af" }}>Confidence: {(preview.confidence * 100).toFixed(0)}%</span>
+                {preview.source === "heuristic" && <span style={{ fontSize: 11, color: "#9ca3af" }}>(offline estimate)</span>}
               </div>
               {preview.themes?.length > 0 && (
                 <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginTop: 6 }}>
@@ -396,8 +300,10 @@ function ReviewForm({ place, onSubmit, onClose }) {
         </div>
       )}
 
-      <button onClick={handleSubmit} disabled={!rating || text.length < 20 || !name || submitting}
-        style={{ padding: "12px", background: rating && text.length >= 20 && name ? "#7c3aed" : "#d1d5db", color: "#fff", border: "none", borderRadius: 10, cursor: rating && text.length >= 20 && name ? "pointer" : "not-allowed", fontWeight: 700, fontSize: 15, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+      {error && <div role="alert" style={{ fontSize: 13, color: "#b91c1c", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 10, padding: "8px 12px" }}>{error}</div>}
+
+      <button onClick={handleSubmit} disabled={!canSubmit}
+        style={{ padding: "12px", background: canSubmit || submitting ? "#7c3aed" : "#d1d5db", color: "#fff", border: "none", borderRadius: 10, cursor: canSubmit ? "pointer" : "not-allowed", fontWeight: 700, fontSize: 15, display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
         {submitting ? "Submitting..." : <><Icon name="send" size={16} /> Submit Review</>}
       </button>
     </div>
@@ -405,30 +311,45 @@ function ReviewForm({ place, onSubmit, onClose }) {
 }
 
 // ─── PLACE DETAIL ─────────────────────────────────────────────────────────────
-function PlaceDetail({ place, reviews: initialReviews, onBack }) {
-  const [reviews, setReviews] = useState(initialReviews || []);
-  const [vibe, setVibe] = useState(place.vibeSummary);
+function PlaceDetail({ place, onBack, onPlaceUpdate }) {
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
   const [vibeLoading, setVibeLoading] = useState(false);
+  const [vibeError, setVibeError] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [reviewFilter, setReviewFilter] = useState("all");
   const meta = categoryMeta[place.category] || categoryMeta.service;
 
-  const refreshVibe = async (revs) => {
-    if (revs.length === 0) return;
+  useEffect(() => {
+    let cancelled = false;
+    setReviewsLoading(true);
+    api.fetchReviews(place._id)
+      .then(list => { if (!cancelled) setReviews(list); })
+      .catch(() => { if (!cancelled) setReviews([]); })
+      .finally(() => { if (!cancelled) setReviewsLoading(false); });
+    return () => { cancelled = true; };
+  }, [place._id]);
+
+  const refreshVibe = async () => {
     setVibeLoading(true);
-    const summary = await generateVibeSummary(place.name, place.category, revs);
-    setVibe(summary);
-    setVibeLoading(false);
+    setVibeError("");
+    try {
+      const vibeSummary = await api.refreshVibe(place._id);
+      onPlaceUpdate({ ...place, vibeSummary });
+    } catch (err) {
+      setVibeError(err.message || "Couldn't refresh the summary right now.");
+    } finally {
+      setVibeLoading(false);
+    }
   };
 
-  const handleNewReview = async (review) => {
-    const updated = [review, ...reviews];
-    setReviews(updated);
-    setShowForm(false);
-    await refreshVibe(updated);
+  const handleNewReview = async ({ review, place: updatedPlace }) => {
+    setReviews(prev => [review, ...prev]);
+    if (updatedPlace) onPlaceUpdate({ ...updatedPlace, vibeSummary: updatedPlace.vibeSummary || place.vibeSummary });
   };
 
-  const avgRating = reviews.length ? reviews.reduce((a, r) => a + r.rating, 0) / reviews.length : place.averageRating;
-  const sentAvg = reviews.length ? reviews.reduce((a, r) => a + r.sentimentScore, 0) / reviews.length : place.sentimentScore;
+  const counts = useMemo(() => reviews.reduce((acc, r) => ({ ...acc, [r.sentimentLabel]: (acc[r.sentimentLabel] || 0) + 1 }), {}), [reviews]);
+  const visibleReviews = reviewFilter === "all" ? reviews : reviews.filter(r => r.sentimentLabel === reviewFilter);
 
   return (
     <div style={{ maxWidth: 700, margin: "0 auto" }}>
@@ -448,11 +369,15 @@ function PlaceDetail({ place, reviews: initialReviews, onBack }) {
               <div style={{ display: "flex", alignItems: "center", gap: 6, color: "#6b7280", fontSize: 13 }}>
                 <Icon name="location" size={14} /> {place.location.address}
               </div>
+              <div style={{ display: "flex", gap: 12, color: "#6b7280", fontSize: 12, marginTop: 6, flexWrap: "wrap" }}>
+                <span>{priceLabel[place.priceRange] || priceLabel.budget}</span>
+                {place.hours?.open && <span>🕒 {place.hours.open === place.hours.close ? "Open 24 hours" : `${place.hours.open} – ${place.hours.close}`}</span>}
+              </div>
             </div>
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 40, fontWeight: 900, color: "#111827", lineHeight: 1 }}>{avgRating.toFixed(1)}</div>
-              <StarDisplay rating={avgRating} size={18} />
-              <div style={{ fontSize: 12, color: "#9ca3af", marginTop: 4 }}>{reviews.length} reviews</div>
+              <div style={{ fontSize: 40, fontWeight: 900, color: "#111827", lineHeight: 1 }}>{place.averageRating.toFixed(1)}</div>
+              <StarDisplay rating={place.averageRating} size={18} />
+              <div style={{ fontSize: 12, color: "#9ca3af", marginTop: 4 }}>{place.totalReviews} reviews</div>
             </div>
           </div>
         </div>
@@ -463,7 +388,7 @@ function PlaceDetail({ place, reviews: initialReviews, onBack }) {
               <span style={{ fontWeight: 800, fontSize: 13, color: "#374151", display: "flex", alignItems: "center", gap: 6 }}>
                 <Icon name="spark" size={14} /> AI VIBE SUMMARY
               </span>
-              <button onClick={() => refreshVibe(reviews)} disabled={vibeLoading} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, color: "#7c3aed", fontWeight: 700 }}>
+              <button onClick={refreshVibe} disabled={vibeLoading || reviews.length === 0} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 12, color: "#7c3aed", fontWeight: 700 }}>
                 {vibeLoading ? "Refreshing..." : "Refresh ↻"}
               </button>
             </div>
@@ -473,14 +398,15 @@ function PlaceDetail({ place, reviews: initialReviews, onBack }) {
               </div>
             ) : (
               <div style={{ background: "#f5f3ff", borderRadius: 12, padding: 16, color: "#374151", fontSize: 14, lineHeight: 1.7, fontStyle: "italic", borderLeft: "3px solid #7c3aed" }}>
-                {vibe}
+                {place.vibeSummary || "No vibe summary yet."}
               </div>
             )}
+            {vibeError && <div style={{ fontSize: 12, color: "#b91c1c", marginTop: 6 }}>{vibeError}</div>}
           </div>
 
           <div style={{ marginBottom: 20 }}>
             <div style={{ fontSize: 13, fontWeight: 700, color: "#374151", marginBottom: 8 }}>COMMUNITY SENTIMENT</div>
-            <SentimentBar score={sentAvg} />
+            <SentimentBar score={place.sentimentScore} />
           </div>
 
           {place.tags?.length > 0 && (
@@ -492,7 +418,7 @@ function PlaceDetail({ place, reviews: initialReviews, onBack }) {
       </div>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <h2 style={{ margin: 0, fontFamily: "'Playfair Display', Georgia, serif", fontSize: 20 }}>Reviews ({reviews.length})</h2>
+        <h2 style={{ margin: 0, fontFamily: "'Playfair Display', Georgia, serif", fontSize: 20 }}>Recent reviews</h2>
         <button onClick={() => setShowForm(!showForm)} style={{ padding: "10px 18px", background: "#7c3aed", color: "#fff", border: "none", borderRadius: 10, cursor: "pointer", fontWeight: 700, fontSize: 14, display: "flex", alignItems: "center", gap: 6 }}>
           {showForm ? "Cancel" : <><Icon name="send" size={14} /> Write Review</>}
         </button>
@@ -505,39 +431,113 @@ function PlaceDetail({ place, reviews: initialReviews, onBack }) {
         </div>
       )}
 
+      {reviews.length > 0 && (
+        <div style={{ display: "flex", gap: 6, marginBottom: 12, flexWrap: "wrap" }}>
+          {["all", "positive", "neutral", "negative"].map(f => (
+            <button key={f} onClick={() => setReviewFilter(f)} aria-pressed={reviewFilter === f} style={{
+              padding: "6px 12px", borderRadius: 99, fontSize: 12, fontWeight: 700, cursor: "pointer",
+              border: `1px solid ${reviewFilter === f ? "#7c3aed" : "#e5e7eb"}`,
+              background: reviewFilter === f ? "#7c3aed" : "#fff", color: reviewFilter === f ? "#fff" : "#374151",
+            }}>
+              {f === "all" ? `All (${reviews.length})` : `${f[0].toUpperCase()}${f.slice(1)} (${counts[f] || 0})`}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {reviews.map(r => <ReviewCard key={r._id} review={r} />)}
-        {reviews.length === 0 && (
+        {reviewsLoading && <div style={{ textAlign: "center", padding: 24, color: "#9ca3af", fontSize: 14 }}>Loading reviews…</div>}
+        {visibleReviews.map(r => <ReviewCard key={r._id} review={r} />)}
+        {!reviewsLoading && reviews.length > 0 && visibleReviews.length === 0 && (
+          <div style={{ textAlign: "center", padding: 24, color: "#9ca3af", fontSize: 14 }}>No {reviewFilter} reviews yet.</div>
+        )}
+        {!reviewsLoading && reviews.length === 0 && (
           <div style={{ textAlign: "center", padding: 40, color: "#9ca3af", fontSize: 14 }}>
             No reviews yet. Be the first to review!
           </div>
         )}
       </div>
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
 
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
+const GLOBAL_STYLES = `
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap');
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #f1f1f1; }
+  ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .place-card-anim { animation: fadeUp 0.4s ease both; }
+  [role="button"]:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #7c3aed; outline-offset: 2px; }
+  @media (max-width: 640px) {
+    .rmc-header { flex-wrap: wrap; height: auto !important; padding: 10px 16px !important; gap: 10px; }
+    .rmc-search { width: 100% !important; }
+    .rmc-nav { overflow-x: auto; padding: 0 8px !important; }
+    .rmc-nav button { white-space: nowrap; padding: 14px 12px !important; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+`;
+
+const SORT_OPTIONS = {
+  trending: { label: "Trending", compare: (a, b) => b.trendScore - a.trendScore },
+  rating: { label: "Top rated", compare: (a, b) => b.averageRating - a.averageRating },
+  reviews: { label: "Most reviewed", compare: (a, b) => b.totalReviews - a.totalReviews },
+  sentiment: { label: "Best vibes", compare: (a, b) => b.sentimentScore - a.sentimentScore },
+};
+
 export default function RateMyCity() {
   const [tab, setTab] = useState("home");
-  const [places, setPlaces] = useState(MOCK_PLACES);
-  const [reviews, setReviews] = useState(MOCK_REVIEWS);
-  const [selectedPlace, setSelectedPlace] = useState(null);
+  const [places, setPlaces] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [offline, setOffline] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
   const [filterCat, setFilterCat] = useState("all");
+  const [sortBy, setSortBy] = useState("trending");
   const [search, setSearch] = useState("");
 
-  const filtered = places.filter(p => {
-    const matchCat = filterCat === "all" || p.category === filterCat;
-    const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.location.sector.toLowerCase().includes(search.toLowerCase());
-    return matchCat && matchSearch;
-  });
-  const trending = [...places].sort((a, b) => b.trendScore - a.trendScore);
+  const loadPlaces = async () => {
+    setLoading(true);
+    setLoadError("");
+    try {
+      const [list, online] = await Promise.all([api.fetchPlaces(), api.isOnline()]);
+      setPlaces(list);
+      setOffline(!online);
+    } catch (err) {
+      setLoadError(err.message || "Couldn't load places.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { loadPlaces(); }, []);
+
+  const selectedPlace = places.find(p => p._id === selectedId) || null;
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return places
+      .filter(p => filterCat === "all" || p.category === filterCat)
+      .filter(p => !q || [p.name, p.location.sector, ...(p.tags || [])].some(v => v.toLowerCase().includes(q)))
+      .sort(SORT_OPTIONS[sortBy].compare);
+  }, [places, filterCat, search, sortBy]);
+  const trending = useMemo(() => [...places].sort(SORT_OPTIONS.trending.compare), [places]);
   const gems = places.filter(p => p.isHiddenGem);
 
   const handlePlaceClick = (place) => {
-    setSelectedPlace(place);
+    setSelectedId(place._id);
+    window.scrollTo({ top: 0 });
+  };
+
+  const handlePlaceUpdate = (updated) => {
+    setPlaces(prev => prev.map(p => (p._id === updated._id ? updated : p)));
   };
 
   // ── NAV ──
@@ -551,6 +551,7 @@ export default function RateMyCity() {
   if (selectedPlace) {
     return (
       <div style={{ minHeight: "100vh", background: "#f9fafb", fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>
+        <style>{GLOBAL_STYLES}</style>
         <header style={{ background: "#fff", borderBottom: "1px solid #e5e7eb", padding: "0 24px", height: 60, display: "flex", alignItems: "center", gap: 16, position: "sticky", top: 0, zIndex: 100 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div style={{ width: 32, height: 32, background: "linear-gradient(135deg,#7c3aed,#ec4899)", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 16 }}>📍</div>
@@ -559,7 +560,7 @@ export default function RateMyCity() {
           </div>
         </header>
         <main style={{ padding: "24px 16px", maxWidth: 800, margin: "0 auto" }}>
-          <PlaceDetail place={selectedPlace} reviews={reviews[selectedPlace._id] || []} onBack={() => setSelectedPlace(null)} />
+          <PlaceDetail place={selectedPlace} onBack={() => setSelectedId(null)} onPlaceUpdate={handlePlaceUpdate} />
         </main>
       </div>
     );
@@ -567,18 +568,10 @@ export default function RateMyCity() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#f9fafb", fontFamily: "'Inter', 'Segoe UI', sans-serif" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap');
-        * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-        .place-card-anim { animation: fadeUp 0.4s ease both; }
-      `}</style>
+      <style>{GLOBAL_STYLES}</style>
 
       {/* HEADER */}
-      <header style={{ background: "#fff", borderBottom: "1px solid #e5e7eb", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
+      <header className="rmc-header" style={{ background: "#fff", borderBottom: "1px solid #e5e7eb", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <div style={{ width: 36, height: 36, background: "linear-gradient(135deg,#7c3aed,#ec4899)", borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 18 }}>📍</div>
           <div>
@@ -586,23 +579,37 @@ export default function RateMyCity() {
             <div style={{ fontSize: 11, color: "#9ca3af", letterSpacing: 1 }}>GREATER NOIDA</div>
           </div>
         </div>
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search places or sectors..."
+        <input className="rmc-search" type="search" aria-label="Search places" value={search}
+          onChange={e => { setSearch(e.target.value); setTab("home"); }} placeholder="Search places, sectors or tags..."
           style={{ width: 260, padding: "8px 14px", borderRadius: 20, border: "1px solid #e5e7eb", fontSize: 14, outline: "none", background: "#f9fafb" }} />
       </header>
 
       {/* NAV TABS */}
-      <nav style={{ background: "#fff", borderBottom: "1px solid #e5e7eb", padding: "0 24px", display: "flex", gap: 4 }}>
+      <nav className="rmc-nav" style={{ background: "#fff", borderBottom: "1px solid #e5e7eb", padding: "0 24px", display: "flex", gap: 4 }}>
         {navItems.map(({ id, icon, label }) => (
-          <button key={id} onClick={() => setTab(id)} style={{ padding: "14px 18px", border: "none", background: "none", cursor: "pointer", fontWeight: 700, fontSize: 13, color: tab === id ? "#7c3aed" : "#6b7280", borderBottom: tab === id ? "2px solid #7c3aed" : "2px solid transparent", display: "flex", alignItems: "center", gap: 6, transition: "all 0.2s" }}>
+          <button key={id} onClick={() => setTab(id)} aria-current={tab === id ? "page" : undefined} style={{ padding: "14px 18px", border: "none", background: "none", cursor: "pointer", fontWeight: 700, fontSize: 13, color: tab === id ? "#7c3aed" : "#6b7280", borderBottom: tab === id ? "2px solid #7c3aed" : "2px solid transparent", display: "flex", alignItems: "center", gap: 6, transition: "all 0.2s" }}>
             <Icon name={icon} size={15} /> {label}
           </button>
         ))}
       </nav>
 
+      {offline && (
+        <div role="status" style={{ background: "#fffbeb", borderBottom: "1px solid #fde68a", color: "#92400e", fontSize: 13, padding: "8px 24px", textAlign: "center" }}>
+          Demo mode: the API isn't reachable, so you're seeing sample data. New reviews are saved in this browser only.
+        </div>
+      )}
+
       <main style={{ padding: "24px 16px", maxWidth: 900, margin: "0 auto" }}>
+        {loading && <div style={{ textAlign: "center", padding: 60, color: "#9ca3af" }}>Loading places…</div>}
+        {loadError && (
+          <div role="alert" style={{ textAlign: "center", padding: 40, color: "#b91c1c" }}>
+            {loadError}{" "}
+            <button onClick={loadPlaces} style={{ marginLeft: 8, padding: "6px 14px", borderRadius: 8, border: "1px solid #fecaca", background: "#fff", color: "#b91c1c", fontWeight: 700, cursor: "pointer" }}>Retry</button>
+          </div>
+        )}
 
         {/* HOME TAB */}
-        {tab === "home" && (
+        {!loading && !loadError && tab === "home" && (
           <div>
             {/* Hero */}
             <div style={{ background: "linear-gradient(135deg,#7c3aed,#ec4899)", borderRadius: 20, padding: "32px 28px", marginBottom: 28, color: "#fff", position: "relative", overflow: "hidden" }}>
@@ -618,7 +625,7 @@ export default function RateMyCity() {
             </div>
 
             {/* Category Filter */}
-            <div style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap", alignItems: "center" }}>
               {[{ id: "all", label: "All Places" }, ...Object.entries(categoryMeta).map(([id, m]) => ({ id, label: m.label }))].map(({ id, label }) => (
                 <button key={id} onClick={() => setFilterCat(id)} style={{
                   padding: "8px 16px", borderRadius: 20, border: "1px solid",
@@ -628,6 +635,10 @@ export default function RateMyCity() {
                   fontSize: 13, fontWeight: 700, cursor: "pointer", transition: "all 0.2s"
                 }}>{label}</button>
               ))}
+              <select aria-label="Sort places" value={sortBy} onChange={e => setSortBy(e.target.value)}
+                style={{ marginLeft: "auto", padding: "8px 12px", borderRadius: 20, border: "1px solid #e5e7eb", background: "#fff", fontSize: 13, fontWeight: 700, color: "#374151", cursor: "pointer" }}>
+                {Object.entries(SORT_OPTIONS).map(([id, { label }]) => <option key={id} value={id}>Sort: {label}</option>)}
+              </select>
             </div>
 
             {/* Grid */}
@@ -647,24 +658,24 @@ export default function RateMyCity() {
         )}
 
         {/* TRENDING TAB */}
-        {tab === "trending" && (
+        {!loading && !loadError && tab === "trending" && (
           <div>
             <div style={{ marginBottom: 24 }}>
               <h2 style={{ margin: "0 0 4px", fontFamily: "'Playfair Display', Georgia, serif", fontSize: 24 }}>🔥 Trending Now</h2>
-              <p style={{ margin: 0, color: "#6b7280", fontSize: 14 }}>Ranked by sentiment momentum, review velocity & ratings. Updated every 6 hours.</p>
+              <p style={{ margin: 0, color: "#6b7280", fontSize: 14 }}>Ranked by recent sentiment, review velocity & ratings. Updated with every new review.</p>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {trending.map((p, i) => {
                 const meta = categoryMeta[p.category] || categoryMeta.service;
                 return (
-                  <div key={p._id} onClick={() => handlePlaceClick(p)} className="place-card-anim" style={{ animationDelay: `${i * 0.06}s`, background: "#fff", borderRadius: 14, border: "1px solid #e5e7eb", padding: "16px 20px", cursor: "pointer", display: "flex", alignItems: "center", gap: 16, transition: "all 0.2s" }}
+                  <div key={p._id} {...clickable(() => handlePlaceClick(p))} className="place-card-anim" style={{ animationDelay: `${i * 0.06}s`, background: "#fff", borderRadius: 14, border: "1px solid #e5e7eb", padding: "16px 20px", cursor: "pointer", display: "flex", alignItems: "center", gap: 16, transition: "all 0.2s" }}
                     onMouseEnter={e => { e.currentTarget.style.boxShadow = "0 6px 24px rgba(0,0,0,0.1)"; e.currentTarget.style.transform = "translateX(4px)"; }}
                     onMouseLeave={e => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "none"; }}>
                     <div style={{ fontSize: 28, fontWeight: 900, color: i < 3 ? "#7c3aed" : "#d1d5db", minWidth: 40, textAlign: "center", fontFamily: "'Playfair Display', Georgia, serif" }}>#{i + 1}</div>
                     <div style={{ width: 44, height: 44, borderRadius: 12, background: meta.bg, display: "flex", alignItems: "center", justifyContent: "center", color: meta.color }}>
                       <Icon name={meta.icon} size={22} />
                     </div>
-                    <div style={{ flex: 1 }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontWeight: 800, fontSize: 15, color: "#111827" }}>{p.name}</div>
                       <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 6 }}>{p.location.sector} · {meta.label}</div>
                       <SentimentBar score={p.sentimentScore} />
@@ -682,13 +693,13 @@ export default function RateMyCity() {
         )}
 
         {/* GEMS TAB */}
-        {tab === "gems" && (
+        {!loading && !loadError && tab === "gems" && (
           <div>
             <div style={{ background: "linear-gradient(135deg,#4c1d95,#7c3aed)", borderRadius: 20, padding: "28px", marginBottom: 28, color: "#fff" }}>
               <h2 style={{ margin: "0 0 8px", fontFamily: "'Playfair Display', Georgia, serif", fontSize: 24 }}>💎 Hidden Gems</h2>
               <p style={{ margin: 0, opacity: 0.85, fontSize: 14 }}>AI-curated spots with high positive sentiment but low discovery. These are the places your seniors never told you about.</p>
               <div style={{ marginTop: 16, fontSize: 12, opacity: 0.7, fontFamily: "monospace" }}>
-                Criteria: Sentiment &gt; 85% · Reviews &lt; 75 · Rating ≥ 4.2 · Trending Up
+                Criteria: Sentiment ≥ 85% · Reviews &lt; 75 · Rating ≥ 4.2 · Trending Up
               </div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>
@@ -705,27 +716,27 @@ export default function RateMyCity() {
         )}
 
         {/* MAP TAB */}
-        {tab === "map" && (
+        {!loading && !loadError && tab === "map" && (
           <div>
             <div style={{ marginBottom: 16 }}>
               <h2 style={{ margin: "0 0 4px", fontFamily: "'Playfair Display', Georgia, serif", fontSize: 24 }}>🗺️ Explore on Map</h2>
-              <p style={{ margin: 0, color: "#6b7280", fontSize: 14 }}>Interactive map view — click any pin to see place details.</p>
+              <p style={{ margin: 0, color: "#6b7280", fontSize: 14 }}>Places grouped by sector — click any card to see details.</p>
             </div>
             {/* Simulated map using CSS grid layout of sectors */}
             <div style={{ background: "#e8f4f8", borderRadius: 20, border: "2px solid #d1d5db", padding: 24, minHeight: 400, position: "relative", overflow: "hidden" }}>
               <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, #cbd5e1 1px, transparent 1px)", backgroundSize: "40px 40px", opacity: 0.5 }} />
               <div style={{ position: "relative", zIndex: 1 }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: "#6b7280", marginBottom: 16, letterSpacing: 1 }}>GREATER NOIDA — SECTOR MAP VIEW</div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, maxWidth: 600 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 12 }}>
                   {places.map(p => {
                     const meta = categoryMeta[p.category] || categoryMeta.service;
                     return (
-                      <div key={p._id} onClick={() => handlePlaceClick(p)}
+                      <div key={p._id} {...clickable(() => handlePlaceClick(p))}
                         style={{ background: "#fff", borderRadius: 12, padding: 12, cursor: "pointer", border: `2px solid ${meta.color}40`, transition: "all 0.2s", boxShadow: "0 2px 8px rgba(0,0,0,0.08)" }}
                         onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.05)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,0,0,0.15)"; }}
                         onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)"; }}>
                         <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 6 }}>
-                          <span style={{ fontSize: 18 }}>{p.isHiddenGem ? "💎" : p.category === "dhaba" ? "🍛" : p.category === "pg" ? "🏠" : p.category === "coaching" ? "📚" : "🚌"}</span>
+                          <span style={{ fontSize: 18 }}>{p.isHiddenGem ? "💎" : meta.emoji}</span>
                           <span style={{ fontSize: 12, fontWeight: 800, color: "#111827", lineHeight: 1.2 }}>{p.name}</span>
                         </div>
                         <div style={{ fontSize: 11, color: "#6b7280" }}>{p.location.sector}</div>
