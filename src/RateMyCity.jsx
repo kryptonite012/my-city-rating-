@@ -86,19 +86,20 @@ const MOCK_REVIEWS = {
 };
 
 // ─── CLAUDE API CALL ─────────────────────────────────────────────────────────
+// Calls go through a server-side proxy (see api/claude.js) so no API key is exposed in the browser.
+// Without VITE_AI_ENDPOINT the app throws here and every caller falls back to its offline logic.
+const AI_ENDPOINT = import.meta.env.VITE_AI_ENDPOINT || "";
+
 async function callClaude(systemPrompt, userPrompt) {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+  if (!AI_ENDPOINT) throw new Error("AI endpoint not configured");
+  const response = await fetch(AI_ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1000,
-      system: systemPrompt,
-      messages: [{ role: "user", content: userPrompt }],
-    }),
+    body: JSON.stringify({ system: systemPrompt, prompt: userPrompt }),
   });
-  const data = await response.json();
-  return data.content?.[0]?.text || "";
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.text) throw new Error(data.error || `AI request failed (${response.status})`);
+  return data.text;
 }
 
 async function analyzeSentiment(reviewText) {
